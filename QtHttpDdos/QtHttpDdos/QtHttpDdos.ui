@@ -113,7 +113,7 @@
       <item>
        <widget class="QLineEdit" name="uaEdt">
         <property name="text">
-         <string>此处填写浏览器UA信息或爬虫欺骗UA</string>
+         <string>Mozilla/5.0 (compatible; Baiduspider/2.0; http://www.baidu.com/search/spider.html)</string>
         </property>
        </widget>
       </item>
@@ -196,7 +196,7 @@
       <item>
        <widget class="QLineEdit" name="runCountEdt">
         <property name="text">
-         <string>100</string>
+         <string>10</string>
         </property>
        </widget>
       </item>
@@ -289,8 +289,6 @@
     </item>
    </layout>
   </widget>
-  <zorder>verticalLayoutWidget</zorder>
-  <zorder>horizontalLayoutWidget_3</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

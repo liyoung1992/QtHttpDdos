@@ -8,9 +8,10 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QTimer>
 #include <QMutex>
+#include <QQueue>
 
 //线程处理类
-class QHttpThread : public QThread
+class QHttpThread : public QObject
 {
     Q_OBJECT
 public:
@@ -30,16 +31,24 @@ public:
     //获取线程数量
     int getRunCount();
     //发送请求
-    int sendRequest(const QString &url,const QString &ua,const QString &cookie);
+    int sendRequest(const QString &url,const QString &ua,
+                    const QString &cookie);
     //获取当前线程请求次数
     int getRequestCount();
+    //开启线程
+    void startThread();
+    //停止线程
+    void stopThread();
     //TODO 代理ip
+
 
 public slots:
     //http请求结束
     void slot_requestFinished();
+    //请求超时
+    void slot_requestTimeout();
     //停止线程
-    void stopThreadImmediately();
+//    void stopThreadImmediately();
 
 private:
     //线程数量
@@ -56,12 +65,13 @@ private:
     QString m_pCookie;
 
     //请求次数
-
-    int m_pRequestCount;
-
-    //判断是否能运行，加锁
-    QMutex m_PLock;
-    bool m_pIsCanRun;
+    int64_t m_pRequestCount;
+    //设置超时计时器
+    QTimer* m_pOutTimer;
+    //线程锁
+    QMutex m_pStop;
+    //是否运行
+    bool m_pRuning;
 };
 
 #endif // QHTTPTHREAD_H
