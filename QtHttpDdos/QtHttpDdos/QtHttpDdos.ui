@@ -279,6 +279,13 @@
        </spacer>
       </item>
       <item>
+       <widget class="QRadioButton" name="proxyIdRbtn">
+        <property name="text">
+         <string>是否使用代理IP</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="controllerpbn">
         <property name="text">
          <string>start</string>

@@ -39,8 +39,14 @@ public:
     void startThread();
     //停止线程
     void stopThread();
-    //TODO 代理ip
-
+    //添加代理ip
+    void addProxyIp(const QString& ip);
+    //添加端口
+    void addProxyPort(const QString& port);
+    //设置是否启用代理ip
+    void switchProxyIp(bool on_off);
+    //得到随机代理ip的下标
+    int  getRandIpIndex();
 
 public slots:
     //http请求结束
@@ -49,6 +55,7 @@ public slots:
     void slot_requestTimeout();
     //停止线程
 //    void stopThreadImmediately();
+
 
 private:
     //线程数量
@@ -72,6 +79,12 @@ private:
     QMutex m_pStop;
     //是否运行
     bool m_pRuning;
+    //是否使用代理ip
+    bool m_pIsProxyIp;
+    //代理ip列表
+    QQueue<QString> m_pProxyIpList;
+    //端口
+    QQueue<QString> m_pProxyPortList;
 };
 
 #endif // QHTTPTHREAD_H

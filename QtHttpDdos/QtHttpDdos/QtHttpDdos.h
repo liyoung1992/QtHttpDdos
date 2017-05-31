@@ -36,6 +36,8 @@ private slots:
     //定时刷新访问次数
     void slot_flushRequestCount();
 
+    void on_proxyIdRbtn_clicked(bool checked);
+
 private:
     Ui::QtHttpDdos *ui;
 
@@ -48,6 +50,12 @@ private:
     QQueue<QThread *> m_pThreadList;
     //标志位，记录是否是新建线程还是开始暂停的线程
     bool m_pIsNewThread;
+    //标志是否使用代理ip
+    bool m_pIsProxyIp;
+    //代理ip列表
+    QQueue<QString> m_pProxyIpList;
+    //端口
+    QQueue<QString> m_pProxyPortList;
 };
 
 #endif // QTHTTPDDOS_H

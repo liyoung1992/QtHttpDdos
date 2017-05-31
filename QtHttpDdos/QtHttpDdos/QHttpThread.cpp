@@ -6,6 +6,7 @@
 #include <QEventLoop>
 #include <QNetworkCookie> //单个cookie
 #include <QNetworkCookieJar> //储存cookie
+#include <QNetworkProxy>
 
 QHttpThread::QHttpThread(QObject* parent)
 {
@@ -48,6 +49,8 @@ void QHttpThread::init()
     m_pNetworkManager = new QNetworkAccessManager();
     m_pNetworkReply = NULL;
 
+    //默认不开启代理ip
+    m_pIsProxyIp = false;
     //默认开启10个线程
     m_pRunCount = 10;
     m_pRequestCount = 0;
@@ -90,8 +93,11 @@ int QHttpThread::sendRequest(const QString &url, const QString &ua,
 
     netRequest.setRawHeader("User-Agent", ua.toLatin1());
     //TODO 添加cookie的支持
-    //netRequest.setHeader(QNetworkRequest::CookieHeader,QVariant::fromValue(QString(cookie)));
+    QList<QNetworkCookie>  cookies = m_pNetworkManager->cookieJar()->cookiesForUrl(url);
+    QVariant var;
+    var.setValue(cookies);
 
+    netRequest.setHeader(QNetworkRequest::CookieHeader, var);
     netRequest.setUrl(QUrl(url)); //地址信息
     //https请求，需ssl支持(下载openssl拷贝libeay32.dll和ssleay32.dll文件至Qt bin目录或程序运行目录)
     if(url.toLower().startsWith("https"))
@@ -101,7 +107,18 @@ int QHttpThread::sendRequest(const QString &url, const QString &ua,
         sslConfig.setProtocol(QSsl::TlsV1_1);
         netRequest.setSslConfiguration(sslConfig);
     }
+    if(m_pIsProxyIp){
+        QNetworkProxy proxy;
+        proxy.setType(QNetworkProxy::HttpProxy);
+        int index = getRandIpIndex();
+        proxy.setHostName(m_pProxyIpList.at(index));
+        proxy.setPort(m_pProxyPortList.at(index).toInt());
+        proxy.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
+        proxy.setRawHeader("User-Agent", ua.toLatin1());
 
+        m_pNetworkManager->setProxy(proxy);
+        QNetworkProxy::setApplicationProxy(proxy);
+    }
     m_pNetworkReply  = m_pNetworkManager->get(netRequest);
     //开始计算是否请求超时
     m_pOutTimer->start(5000);
@@ -127,6 +144,29 @@ void QHttpThread::stopThread()
     m_pStop.lock();
     m_pRuning = false;
     m_pStop.unlock();
+}
+//添加代理ip
+void QHttpThread::addProxyIp(const QString &ip)
+{
+    m_pProxyIpList.enqueue(ip);
+}
+
+void QHttpThread::addProxyPort(const QString &port)
+{
+    m_pProxyPortList.enqueue(port);
+}
+
+void QHttpThread::switchProxyIp(bool on_off)
+{
+    m_pIsProxyIp = on_off;
+}
+
+int QHttpThread::getRandIpIndex()
+{
+
+   qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
+   int rand = qrand() % m_pProxyIpList.length();
+   return rand;
 }
 
 
