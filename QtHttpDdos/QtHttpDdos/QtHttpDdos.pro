@@ -16,7 +16,7 @@ QT       += core gui network
 
 
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets axcontainer
 
 TARGET = QtHttpDdos
 TEMPLATE = app
@@ -35,11 +35,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp\
         QtHttpDdos.cpp \
-    QHttpRequest.cpp \
-    QHttpThread.cpp
+    QHttpThread.cpp \
+    qtwebview.cpp
 
 HEADERS  += QtHttpDdos.h \
-    QHttpRequest.h \
-    QHttpThread.h
+    QHttpThread.h \
+    webaxwidget.h \
+    qtwebview.h
 
-FORMS    += QtHttpDdos.ui
+FORMS    += QtHttpDdos.ui \
+    qtwebview.ui
+
+# install
+target.path = $$[QT_INSTALL_EXAMPLES]/activeqt/webbrowser
+INSTALLS += target

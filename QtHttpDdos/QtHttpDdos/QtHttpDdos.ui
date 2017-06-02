@@ -6,9 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>382</width>
-    <height>223</height>
+    <width>772</width>
+    <height>523</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>772</width>
+    <height>523</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>772</width>
+    <height>523</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>QtHttpDdos</string>
@@ -20,9 +38,9 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>0</y>
-     <width>371</width>
-     <height>211</height>
+     <y>10</y>
+     <width>751</width>
+     <height>491</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -66,14 +84,21 @@
       <item>
        <widget class="QLineEdit" name="urlEdt">
         <property name="text">
-         <string>http://127.0.0.1</string>
+         <string>http://www.wall.cc</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="importIpbtn">
+       <widget class="QPushButton" name="getCookieBtn">
         <property name="text">
-         <string>导入代理IP</string>
+         <string>打开抓包工具</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="openUrl">
+        <property name="text">
+         <string>打开网页</string>
         </property>
        </widget>
       </item>
@@ -111,9 +136,13 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="uaEdt">
-        <property name="text">
-         <string>Mozilla/5.0 (compatible; Baiduspider/2.0; http://www.baidu.com/search/spider.html)</string>
+       <widget class="QTextEdit" name="uaEdt">
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -151,7 +180,15 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="cookieEdt"/>
+       <widget class="QTextEdit" name="cookieEdt">
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;PHPSESSID=rquafa9vr069r9be4uouh05081;  token=bdcf196aca10f87b82efef10d493c1427d7f9859;  refer=http%3A%2F%2Fwww.wall.cc%2F;  thinkphp_show_page_trace=0|0;  Hm_lvt_f4c8ddc15f3cb2f2ea9198ff0ced68ac=1496211090,1496215031,1496222046,1496280068;  Hm_lpvt_f4c8ddc15f3cb2f2ea9198ff0ced68ac=1496282831&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -174,6 +211,9 @@
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Minimum</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -277,6 +317,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="importIpbtn">
+        <property name="text">
+         <string>导入代理IP</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QRadioButton" name="proxyIdRbtn">

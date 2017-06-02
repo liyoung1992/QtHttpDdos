@@ -18,6 +18,10 @@ class QtHttpDdos : public QWidget
 public:
     explicit QtHttpDdos(QWidget *parent = 0);
     ~QtHttpDdos();
+    //设置浏览器类
+    void setUserAgent(const QString user_agent);
+    //设置cookie
+    void setCookies(const QString cookies);
 
 private:
     //开始请求
@@ -37,6 +41,10 @@ private slots:
     void slot_flushRequestCount();
 
     void on_proxyIdRbtn_clicked(bool checked);
+
+    void on_getCookieBtn_clicked();
+
+    void on_openUrl_clicked();
 
 private:
     Ui::QtHttpDdos *ui;

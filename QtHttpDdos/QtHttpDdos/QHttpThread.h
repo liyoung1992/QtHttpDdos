@@ -47,6 +47,9 @@ public:
     void switchProxyIp(bool on_off);
     //得到随机代理ip的下标
     int  getRandIpIndex();
+    //获取cookie
+
+    QList<QNetworkCookie> getCookies();
 
 public slots:
     //http请求结束
@@ -85,6 +88,10 @@ private:
     QQueue<QString> m_pProxyIpList;
     //端口
     QQueue<QString> m_pProxyPortList;
+    //cookie
+    QNetworkCookieJar* m_pCookieJar;
+
+
 };
 
 #endif // QHTTPTHREAD_H

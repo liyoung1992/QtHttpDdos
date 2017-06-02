@@ -45,10 +45,9 @@ QHttpThread::~QHttpThread()
 //初始化
 void QHttpThread::init()
 {
-
     m_pNetworkManager = new QNetworkAccessManager();
     m_pNetworkReply = NULL;
-
+    m_pCookieJar = new QNetworkCookieJar();
     //默认不开启代理ip
     m_pIsProxyIp = false;
     //默认开启10个线程
@@ -86,18 +85,35 @@ int QHttpThread::getRunCount()
 
 //发送http请求
 int QHttpThread::sendRequest(const QString &url, const QString &ua,
-                             const QString &cookie)
+                             const QString &cookies)
 {
     QNetworkRequest netRequest;
     netRequest.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
 
     netRequest.setRawHeader("User-Agent", ua.toLatin1());
-    //TODO 添加cookie的支持
-    QList<QNetworkCookie>  cookies = m_pNetworkManager->cookieJar()->cookiesForUrl(url);
-    QVariant var;
-    var.setValue(cookies);
+    if(cookies.length() > 5){
+        //TODO 添加cookie的支持
+         QStringList list = cookies.split(";");
+         QList<QNetworkCookie> cookieList;
+         for(int i = 0; i < list.length(); i++){
+             QStringList cookieStr = list.at(i).split("=");
+             QByteArray cookieName = cookieStr.at(0).toLatin1();
+             QByteArray cookieValue = cookieStr.at(1).toLatin1();
 
-    netRequest.setHeader(QNetworkRequest::CookieHeader, var);
+             QNetworkCookie cookie(cookieName,cookieValue);
+             cookie.setExpirationDate(QDateTime::currentDateTime().addMonths(1));
+             cookie.setSecure(true);
+             cookieList.append(cookie);
+         }
+        QVariant var;
+        var.setValue(cookieList);
+        m_pNetworkManager->setCookieJar(m_pCookieJar);
+
+        m_pNetworkManager->cookieJar()->setAllCookies(cookieList);
+        netRequest.setHeader(QNetworkRequest::CookieHeader, var);
+    }
+
+
     netRequest.setUrl(QUrl(url)); //地址信息
     //https请求，需ssl支持(下载openssl拷贝libeay32.dll和ssleay32.dll文件至Qt bin目录或程序运行目录)
     if(url.toLower().startsWith("https"))
@@ -119,6 +135,7 @@ int QHttpThread::sendRequest(const QString &url, const QString &ua,
         m_pNetworkManager->setProxy(proxy);
         QNetworkProxy::setApplicationProxy(proxy);
     }
+
     m_pNetworkReply  = m_pNetworkManager->get(netRequest);
     //开始计算是否请求超时
     m_pOutTimer->start(5000);
@@ -167,6 +184,11 @@ int QHttpThread::getRandIpIndex()
    qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
    int rand = qrand() % m_pProxyIpList.length();
    return rand;
+}
+
+QList<QNetworkCookie> QHttpThread::getCookies()
+{
+    return m_pNetworkManager->cookieJar()->allCookies();
 }
 
 
