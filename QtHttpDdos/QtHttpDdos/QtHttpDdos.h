@@ -22,7 +22,8 @@ public:
     void setUserAgent(const QString user_agent);
     //设置cookie
     void setCookies(const QString cookies);
-
+//    bool  nativeEvent(const QByteArray &eventType, void *message, long *result);
+    void closeEvent(QCloseEvent *event);
 private:
     //开始请求
     void startRequest();
@@ -46,6 +47,9 @@ private slots:
 
     void on_openUrl_clicked();
 
+
+    void on_surePageRange_clicked(bool checked);
+
 private:
     Ui::QtHttpDdos *ui;
 
@@ -60,6 +64,8 @@ private:
     bool m_pIsNewThread;
     //标志是否使用代理ip
     bool m_pIsProxyIp;
+    //记录是否随机访问页面
+    bool m_pRandPage;
     //代理ip列表
     QQueue<QString> m_pProxyIpList;
     //端口

@@ -47,15 +47,20 @@ public:
     void switchProxyIp(bool on_off);
     //得到随机代理ip的下标
     int  getRandIpIndex();
+    //设置随意分页的范围
+    void setPageRange(const int &start,const int &end);
+    //获取随机分页的url
+    QString getPageUrl();
+    int getRandPage();
     //获取cookie
 
-    QList<QNetworkCookie> getCookies();
+//    QList<QNetworkCookie> getCookies();
 
 public slots:
     //http请求结束
-    void slot_requestFinished();
-    //请求超时
-    void slot_requestTimeout();
+//    void slot_requestFinished();
+//    //请求超时
+//    void slot_requestTimeout();
     //停止线程
 //    void stopThreadImmediately();
 
@@ -76,8 +81,7 @@ private:
 
     //请求次数
     int64_t m_pRequestCount;
-    //设置超时计时器
-    QTimer* m_pOutTimer;
+
     //线程锁
     QMutex m_pStop;
     //是否运行
@@ -91,7 +95,11 @@ private:
     //cookie
     QNetworkCookieJar* m_pCookieJar;
 
-
+    //请求分页范围
+    int m_pPageStart;
+    int m_pPageEnd;
+    //是否启用分页
+    bool m_pIsOpenPage;
 };
 
 #endif // QHTTPTHREAD_H
